@@ -1,0 +1,34 @@
+.root {
+    // :global {
+    //     .previous {
+    //         background-color: red
+    //     }
+    // }
+    display: flex;
+    justify-content: center;
+    column-gap: 8px;
+    a {
+        color: #f24701;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #f24701;
+        border-radius: 30px;
+        height: 40px;
+        width: 40px;
+        cursor: pointer;
+        &:hover {
+            background-color: #f24701;
+            color: rgb(255, 255, 255);
+        }
+    }
+    :global {
+            .selected {
+                a {
+                    color: rgb(255, 255, 255);
+                    background-color: #f24701;
+                }
+            }
+        }
+}
