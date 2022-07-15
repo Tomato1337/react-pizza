@@ -22,7 +22,7 @@ const Categories = () => {
             <li
                 key={nanoid()}
                 onClick={() => dispatch(setCategoryId(i))}
-                className={value === i ? 'active' : ''}
+                className={parseInt(value) === i ? 'active' : ''}
             >
                 {item}
             </li>

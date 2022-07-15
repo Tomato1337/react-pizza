@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { nanoid } from 'nanoid'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -12,6 +12,7 @@ const Sort = () => {
     const sortTypeActive = useSelector((state) => state.filter.sortTypeActive)
     const sortOrder = useSelector((state) => state.filter.sortOrder)
     const dispatch = useDispatch()
+    const sortRef = useRef(false)
     // const [sortActive, setSortActive] = useState(false)
     // const [sortItemActive, setSortItemActive] = useState('популярности')
     const sortElem = ['популярности', 'цене', 'алфавиту']
@@ -23,8 +24,21 @@ const Sort = () => {
         dispatch(setSortTypeActive(false))
     }
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.composedPath().includes(sortRef.current)) {
+                dispatch(setSortTypeActive(false))
+            }
+        }
+
+        document.body.addEventListener('click', handleClickOutside)
+
+        return () =>
+            document.body.removeEventListener('click', handleClickOutside)
+    }, [])
+
     return (
-        <div className="sort">
+        <div ref={sortRef} className="sort">
             <div tabIndex={0} className="sort__label">
                 <svg
                     onClick={() => dispatch(setSortOrder(!sortOrder))}

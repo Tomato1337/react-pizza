@@ -7,7 +7,7 @@ const Skeleton = (props) => {
         <ContentLoader
             speed={2}
             key={nanoid()}
-            width={280}
+            width={300}
             className="pizza-block"
             height={465}
             viewBox="0 0 280 465"

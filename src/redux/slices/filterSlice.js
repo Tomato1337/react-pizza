@@ -5,6 +5,8 @@ const initialState = {
     sortType: 0,
     sortTypeActive: false,
     sortOrder: true,
+    currentPage: 1,
+    searchText: '',
 }
 
 const filterSlice = createSlice({
@@ -23,12 +25,32 @@ const filterSlice = createSlice({
         setSortOrder: (state, action) => {
             state.sortOrder = action.payload
         },
+        setCurrentPage: (state, action) => {
+            state.currentPage = action.payload
+        },
+        setSearchText: (state, action) => {
+            state.searchText = action.payload
+        },
+        setFilters: (state, action) => {
+            state.currentPage = parseInt(action.payload.page)
+            state.sortOrder = JSON.parse(action.payload.order)
+            state.categoryId = parseInt(action.payload.category)
+            state.sortType = parseInt(action.payload.sortBy)
+            state.searchText = action.payload.search
+        },
     },
 })
 
 const { actions, reducer } = filterSlice
 
-export const { setCategoryId, setSortType, setSortTypeActive, setSortOrder } =
-    actions
+export const {
+    setCategoryId,
+    setSortType,
+    setSortTypeActive,
+    setSortOrder,
+    setCurrentPage,
+    setFilters,
+    setSearchText,
+} = actions
 
 export default reducer

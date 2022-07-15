@@ -4,50 +4,131 @@ import { nanoid } from 'nanoid'
 import PizzaBlock from '../components/PizzaBlock/PizzaBlock'
 import Categories from '../components/Categories/Categories'
 import Sort from '../components/Sort/Sort'
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState, useContext, useRef } from 'react'
 import Pagination from '../components/Pagination/Pagination'
 import { AppContext } from '../App'
 import { useSelector } from 'react-redux'
+import axios from 'axios'
+import qs from 'qs'
+import {
+    setCurrentPage,
+    setSortType,
+    setSortOrder,
+    setCategoryId,
+    setFilters,
+} from '../redux/slices/filterSlice'
+import { useDispatch } from 'react-redux'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 const Home = () => {
-    const categoryId = useSelector((state) => state.filter.categoryId)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
-    const { searchValue } = useContext(AppContext)
+    // const { searchValue } = useContext(AppContext)
     const [pizzas, setPizzas] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
     // const [categoryId, setCategoryId] = useState(0)
     // const [orderType, setOrderType] = useState(true)
+    const categoryId = useSelector((state) => state.filter.categoryId)
     const sortType = useSelector((state) => state.filter.sortType)
     const orderType = useSelector((state) => state.filter.sortOrder)
+    const currentPage = useSelector((state) => state.filter.currentPage)
+    const searchValue = useSelector((state) => state.filter.searchText)
     // const [sortType, setSortType] = useState(0)
-    const [currentPage, setCurrentPage] = useState(1)
+    // const [currentPage, setCurrentPage] = useState(1)
 
-    const { request } = useHttp()
+    // useEffect(() => {
+    //     dispatch(setCurrentPage(searchParams.get('page')))
+    //     dispatch(setSortType(searchParams.get('sortBy')))
+    //     dispatch(setSortOrder(searchParams.get('order')))
+    //     dispatch(setCategoryId(searchParams.get('category')))
+    // }, [searchParams.get('page')])
+
+    // const { request } = useHttp()
     const sortNames = ['rating', 'price', 'title']
+    const isSearch = useRef(false)
+    const isMounted = useRef(false)
 
     useEffect(() => {
         window.scrollTo(0, 0)
+        if (window.location.search) {
+            const params = qs.parse(window.location.search.substring(1))
+            console.log(params)
+            dispatch(setFilters(params))
+            isSearch.current = true
+        } //TODO:Допилить localStorage
+        // else if (localStorage.length > 0) {
+        //     const obj = {
+        //         category: localStorage.getItem('category'),
+        //         order: localStorage.getItem('order'),
+        //         page: localStorage.getItem('page'),
+        //         search: localStorage.getItem('search'),
+        //         sortBy: localStorage.getItem('sortBy'),
+        //     }
+        //     dispatch(setFilters(obj))
+        //     isSearch.current = true
+        // } else {
+        //     localStorage.setItem('category', categoryId)
+        //     localStorage.setItem('order', orderType)
+        //     localStorage.setItem('page', currentPage)
+        //     localStorage.setItem('search', searchValue)
+        //     localStorage.setItem('sortBy', sortType)
+        // }
     }, [])
 
     useEffect(() => {
-        setLoading(true)
-        getPizzas()
+        if (isMounted.current) {
+            const queryString = qs.stringify({
+                sortBy: sortType,
+                category: categoryId,
+                page: currentPage,
+                order: orderType,
+                search: searchValue,
+            })
+            navigate(`?${queryString}`)
+
+            //TODO: localStorage.setItem('category', categoryId)
+            // localStorage.setItem('order', orderType)
+            // localStorage.setItem('page', currentPage)
+            // localStorage.setItem('search', searchValue)
+            // localStorage.setItem('sortBy', sortType)
+        }
+
+        console.log('render')
+        isMounted.current = true
+        // console.log(queryString)
+    }, [categoryId, sortType, orderType, searchValue, currentPage])
+
+    useEffect(() => {
+        if (!isSearch.current) {
+            setLoading(true)
+            getPizzas()
+        }
+        isSearch.current = false
     }, [categoryId, sortType, orderType, searchValue, currentPage])
 
     const getPizzas = () => {
         const categories = categoryId === 0 ? '' : `category=${categoryId}`
-        const sort = sortNames[sortType]
+        const sort = sortNames[parseInt(sortType)]
         const order = orderType ? 'asc' : 'desc'
         const search = searchValue
             ? `&search=${searchValue.toLowerCase().replace(/\s/gi, '')}`
             : ''
-
-        request(
-            `https://62c875e00f32635590d909c9.mockapi.io/items?page=${currentPage}&limit=4&${categories}&sortBy=${sort}&order=${order}${search}`
-        )
-            .then((item) => updatePizzas(item))
-            .catch((err) => updatePizzasError())
+        console.log(categories, sort, order, search)
+        axios
+            .get(
+                `https://62c875e00f32635590d909c9.mockapi.io/items?page=${currentPage}&limit=4&${categories}&sortBy=${sort}&order=${order}${search}`
+            )
+            .then((res) => {
+                updatePizzas(res.data)
+            })
+            .catch((res) => updatePizzasError())
+        // request(
+        //     `https://62c875e00f32635590d909c9.mockapi.io/items?page=${currentPage}&limit=4&${categories}&sortBy=${sort}&order=${order}${search}`
+        // )
+        //     .then((item) => updatePizzas(item))
+        //     .catch((err) => updatePizzasError())
     }
 
     const updatePizzas = (item) => {
@@ -115,7 +196,7 @@ const Home = () => {
                     pizzaBlocks
                 )}
             </div>
-            <Pagination onChangePage={setCurrentPage} />
+            <Pagination onChangePage={(id) => dispatch(setCurrentPage(id))} />
         </>
     )
 }
