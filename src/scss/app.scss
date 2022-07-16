@@ -90,6 +90,25 @@ body {
   }
 }
 
+.error_block {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 50px;
+  span {
+    color: red;
+  }
+  p {
+    font-weight: bold;
+    font-size: 18px;
+  }
+  img {
+    width:150px;
+  }
+}
+
 @media (max-width: 444px) {
   .header {
     .container {

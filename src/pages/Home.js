@@ -17,6 +17,7 @@ import {
     setCategoryId,
     setFilters,
 } from '../redux/slices/filterSlice'
+import { setItems, fetchPizzas } from '../redux/slices/pizzasSlice'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -25,9 +26,9 @@ const Home = () => {
     const navigate = useNavigate()
 
     // const { searchValue } = useContext(AppContext)
-    const [pizzas, setPizzas] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
+    // const [pizzas, setPizzas] = useState([])
+    // const [loading, setLoading] = useState(true)
+    // const [error, setError] = useState(false)
     // const [categoryId, setCategoryId] = useState(0)
     // const [orderType, setOrderType] = useState(true)
     const categoryId = useSelector((state) => state.filter.categoryId)
@@ -35,6 +36,10 @@ const Home = () => {
     const orderType = useSelector((state) => state.filter.sortOrder)
     const currentPage = useSelector((state) => state.filter.currentPage)
     const searchValue = useSelector((state) => state.filter.searchText)
+    const pizzas = useSelector((state) => state.pizzas.items)
+    const loading = useSelector((state) => state.pizzas.loadingPizzas)
+    const error = useSelector((state) => state.pizzas.errorPizzas)
+    const errorMessage = useSelector((state) => state.pizzas.errorMessage)
     // const [sortType, setSortType] = useState(0)
     // const [currentPage, setCurrentPage] = useState(1)
 
@@ -78,21 +83,25 @@ const Home = () => {
     }, [])
 
     useEffect(() => {
-        if (isMounted.current) {
-            const queryString = qs.stringify({
-                sortBy: sortType,
-                category: categoryId,
-                page: currentPage,
-                order: orderType,
-                search: searchValue,
-            })
-            navigate(`?${queryString}`)
+        if (categoryId === 0) {
+            navigate('')
+        } else {
+            if (isMounted.current) {
+                const queryString = qs.stringify({
+                    sortBy: sortType,
+                    category: categoryId,
+                    page: currentPage,
+                    order: orderType,
+                    search: searchValue,
+                })
+                navigate(`?${queryString}`)
 
-            //TODO: localStorage.setItem('category', categoryId)
-            // localStorage.setItem('order', orderType)
-            // localStorage.setItem('page', currentPage)
-            // localStorage.setItem('search', searchValue)
-            // localStorage.setItem('sortBy', sortType)
+                //TODO: localStorage.setItem('category', categoryId)
+                // localStorage.setItem('order', orderType)
+                // localStorage.setItem('page', currentPage)
+                // localStorage.setItem('search', searchValue)
+                // localStorage.setItem('sortBy', sortType)
+            }
         }
 
         console.log('render')
@@ -102,13 +111,13 @@ const Home = () => {
 
     useEffect(() => {
         if (!isSearch.current) {
-            setLoading(true)
+            // setLoading(true)
             getPizzas()
         }
         isSearch.current = false
     }, [categoryId, sortType, orderType, searchValue, currentPage])
 
-    const getPizzas = () => {
+    const getPizzas = async () => {
         const categories = categoryId === 0 ? '' : `category=${categoryId}`
         const sort = sortNames[parseInt(sortType)]
         const order = orderType ? 'asc' : 'desc'
@@ -116,31 +125,38 @@ const Home = () => {
             ? `&search=${searchValue.toLowerCase().replace(/\s/gi, '')}`
             : ''
         console.log(categories, sort, order, search)
-        axios
-            .get(
-                `https://62c875e00f32635590d909c9.mockapi.io/items?page=${currentPage}&limit=4&${categories}&sortBy=${sort}&order=${order}${search}`
-            )
-            .then((res) => {
-                updatePizzas(res.data)
+        dispatch(
+            fetchPizzas({
+                categories,
+                sort,
+                order,
+                search,
+                currentPage,
             })
-            .catch((res) => updatePizzasError())
-        // request(
-        //     `https://62c875e00f32635590d909c9.mockapi.io/items?page=${currentPage}&limit=4&${categories}&sortBy=${sort}&order=${order}${search}`
-        // )
-        //     .then((item) => updatePizzas(item))
-        //     .catch((err) => updatePizzasError())
+        )
+
+        // try {
+        //     // const { data } = await axios.get(
+        //     //     `https://62c875e00f32635590d909c9.mockapi.io/items?page=${currentPage}&limit=4&${categories}&sortBy=${sort}&order=${order}${search}`
+        //     //
+
+        //     // updatePizzas(data)
+        // } catch (err) {
+        //     updatePizzasError()
+        //     throw new Error(err)
+        // }
     }
 
-    const updatePizzas = (item) => {
-        setLoading(false)
-        setError(false)
-        setPizzas(item)
-    }
+    // const updatePizzas = (item) => {
+    //     setLoading(false)
+    //     setError(false)
+    //     dispatch(setItems(item))
+    // }
 
-    const updatePizzasError = () => {
-        setError(true)
-        setLoading(false)
-    }
+    // const updatePizzasError = () => {
+    //     setError(true)
+    //     setLoading(false)
+    // }
 
     const skeleton = [...new Array(4)].map((obj) => {
         return <Skeleton key={nanoid()} />
@@ -170,7 +186,25 @@ const Home = () => {
 
     const pizzaBlocks = loading ? skeleton : pizzasBlock
 
-    const errorBlock = !loading && error ? <h2>Error</h2> : null
+    const errorBlock =
+        !loading && error ? (
+            <div className="error_block">
+                <img
+                    src="https://cdn4.iconfinder.com/data/icons/symbol-blue-set-1/100/Untitled-2-71-256.png"
+                    alt="error"
+                />
+                <p>Произошла ошибка!</p>
+                <h4>
+                    Ошибка: <span>{errorMessage}</span>
+                </h4>
+            </div>
+        ) : null
+
+    const errorStyles = {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
 
     return (
         <>
@@ -188,12 +222,18 @@ const Home = () => {
                 <div />
             </div>
             <h2 className="content__title">Все пиццы</h2>
-            <div className="content__items">
-                {errorBlock}
-                {pizzaBlocks.length === 0 ? (
-                    <h2>Ничего не найдено</h2>
+            <div
+                style={errorBlock ? errorStyles : null}
+                className="content__items"
+            >
+                {!errorBlock ? (
+                    pizzaBlocks.length === 0 ? (
+                        <h2>Ничего не найдено</h2>
+                    ) : (
+                        pizzaBlocks
+                    )
                 ) : (
-                    pizzaBlocks
+                    errorBlock
                 )}
             </div>
             <Pagination onChangePage={(id) => dispatch(setCurrentPage(id))} />
