@@ -4,12 +4,28 @@ import Home from './pages/Home'
 import Cart from './pages/Cart'
 import NotFound from './pages/NotFound'
 import { Routes, Route } from 'react-router-dom'
+import {
+    addItem,
+    minusItem,
+    addItems,
+    clearItems,
+    removeItem,
+} from './redux/slices/cartSlice'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { useState, createContext } from 'react'
 
 const AppContext = createContext('')
 
 function App() {
     const [searchValue, setSearchValue] = useState('')
+    const dispatch = useDispatch()
+
+    if (localStorage.getItem('cart')) {
+        dispatch(addItems(JSON.parse(localStorage.getItem('cart'))))
+    } else {
+        localStorage.setItem('cart', JSON.stringify([]))
+    }
 
     return (
         <div className="wrapper">
