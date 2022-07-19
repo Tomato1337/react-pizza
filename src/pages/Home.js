@@ -19,7 +19,8 @@ import {
 } from '../redux/slices/filterSlice'
 import { setItems, fetchPizzas } from '../redux/slices/pizzasSlice'
 import { useDispatch } from 'react-redux'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import NotFoundBlock from '../components/NotFoundBlock/NotFoundBlock'
 
 const Home = () => {
     const dispatch = useDispatch()
@@ -223,12 +224,14 @@ const Home = () => {
             </div>
             <h2 className="content__title">Все пиццы</h2>
             <div
-                style={errorBlock ? errorStyles : null}
+                style={
+                    errorBlock || pizzaBlocks.length === 0 ? errorStyles : null
+                }
                 className="content__items"
             >
                 {!errorBlock ? (
                     pizzaBlocks.length === 0 ? (
-                        <h2>Ничего не найдено</h2>
+                        <NotFoundBlock />
                     ) : (
                         pizzaBlocks
                     )

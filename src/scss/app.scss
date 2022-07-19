@@ -90,8 +90,9 @@ body {
   }
 }
 
-.error_block {
-  width: 100%;
+.error {
+  &_block {
+    width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -107,7 +108,22 @@ body {
   img {
     width:150px;
   }
+  }
+  &_404 {
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    margin-bottom: 50px;
+    &_block {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  }
 }
+
+
 
 @media (max-width: 444px) {
   .header {

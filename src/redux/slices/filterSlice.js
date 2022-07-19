@@ -43,6 +43,8 @@ const filterSlice = createSlice({
 
 const { actions, reducer } = filterSlice
 
+export const selectSort = (state) => state.filter.sortType
+
 export const {
     setCategoryId,
     setSortType,

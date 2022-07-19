@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { nanoid } from 'nanoid'
 import { addItem } from '../../redux/slices/cartSlice'
+import { Link } from 'react-router-dom'
 
 const PizzaBlock = ({ id, price, title, category, imageUrl, sizes, types }) => {
     const cartItem = useSelector((state) =>
@@ -27,11 +28,13 @@ const PizzaBlock = ({ id, price, title, category, imageUrl, sizes, types }) => {
     return (
         <div className="pizza-block__wrapper">
             <div className="pizza-block">
-                <img
-                    className="pizza-block__image"
-                    src={imageUrl}
-                    alt="Pizza"
-                />
+                <Link to={`/pizza/${id}`}>
+                    <img
+                        className="pizza-block__image"
+                        src={imageUrl}
+                        alt="Pizza"
+                    />
+                </Link>
                 <h4 className="pizza-block__title">{title}</h4>
                 <div className="pizza-block__selector">
                     <ul>

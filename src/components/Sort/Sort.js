@@ -5,10 +5,11 @@ import {
     setSortType,
     setSortTypeActive,
     setSortOrder,
+    selectSort,
 } from '../../redux/slices/filterSlice'
 
 const Sort = () => {
-    const value = useSelector((state) => state.filter.sortType)
+    const value = useSelector(selectSort)
     const sortTypeActive = useSelector((state) => state.filter.sortTypeActive)
     const sortOrder = useSelector((state) => state.filter.sortOrder)
     const dispatch = useDispatch()
