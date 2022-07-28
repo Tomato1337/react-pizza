@@ -1,6 +1,6 @@
 import styles from './NotFoundBlock.module.scss'
 
-const NotFoundBlock = () => {
+const NotFoundBlock: React.FC = () => {
     return (
         <div className="error_404">
             <div className="error_404_block">

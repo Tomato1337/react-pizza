@@ -1,29 +1,36 @@
 import { useHttp } from '../hooks/http.hook'
-import Skeleton from '../components/Skeleton/Skeleton'
 import { nanoid } from 'nanoid'
-import PizzaBlock from '../components/PizzaBlock/PizzaBlock'
-import Categories from '../components/Categories/Categories'
-import Sort from '../components/Sort/Sort'
-import { useEffect, useState, useContext, useRef } from 'react'
-import Pagination from '../components/Pagination/Pagination'
-import { AppContext } from '../App'
-import { useSelector } from 'react-redux'
+
+import {PizzaBlock, Skeleton, Categories, Pagination, NotFoundBlock, Sort} from '../components/'
+// import Categories from '../components/Categories'
+// import Skeleton from '../components/Skeleton'
+// import Sort from '../components/Sort'
+// import NotFoundBlock from '../components/NotFoundBlock/NotFoundBlock'
+// import Pagination from '../components/Pagination/Pagination'
+
+// import { AppContext } from '../App'
+
 import axios from 'axios'
 import qs from 'qs'
+
 import {
     setCurrentPage,
     setSortType,
     setSortOrder,
     setCategoryId,
     setFilters,
+    FilterSliceState,
 } from '../redux/slices/filterSlice'
 import { setItems, fetchPizzas } from '../redux/slices/pizzasSlice'
+
+import { useEffect, useState, useContext, useRef, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import NotFoundBlock from '../components/NotFoundBlock/NotFoundBlock'
+import { RootState, useAppDispatch } from '../redux/store'
+import { useSelector } from 'react-redux'
 
-const Home = () => {
-    const dispatch = useDispatch()
+const Home: React.FC = () => {
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
     // const { searchValue } = useContext(AppContext)
@@ -32,15 +39,15 @@ const Home = () => {
     // const [error, setError] = useState(false)
     // const [categoryId, setCategoryId] = useState(0)
     // const [orderType, setOrderType] = useState(true)
-    const categoryId = useSelector((state) => state.filter.categoryId)
-    const sortType = useSelector((state) => state.filter.sortType)
-    const orderType = useSelector((state) => state.filter.sortOrder)
-    const currentPage = useSelector((state) => state.filter.currentPage)
-    const searchValue = useSelector((state) => state.filter.searchText)
-    const pizzas = useSelector((state) => state.pizzas.items)
-    const loading = useSelector((state) => state.pizzas.loadingPizzas)
-    const error = useSelector((state) => state.pizzas.errorPizzas)
-    const errorMessage = useSelector((state) => state.pizzas.errorMessage)
+    const categoryId = useSelector((state: RootState) => state.filter.categoryId)
+    const sortType = useSelector((state: RootState) => state.filter.sortType)
+    const orderType = useSelector((state: RootState) => state.filter.sortOrder)
+    const currentPage = useSelector((state: RootState) => state.filter.currentPage)
+    const searchValue = useSelector((state: RootState) => state.filter.searchText)
+    const pizzas = useSelector((state: RootState) => state.pizzas.items)
+    const loading = useSelector((state: RootState) => state.pizzas.loadingPizzas)
+    const error = useSelector((state: RootState) => state.pizzas.errorPizzas)
+    const errorMessage = useSelector((state: RootState) => state.pizzas.errorMessage)
     // const [sortType, setSortType] = useState(0)
     // const [currentPage, setCurrentPage] = useState(1)
 
@@ -61,7 +68,14 @@ const Home = () => {
         if (window.location.search) {
             const params = qs.parse(window.location.search.substring(1))
             console.log(params)
-            dispatch(setFilters(params))
+            const obj = {
+                categoryId: parseInt(params.categoryId as string),
+                sortType: parseInt(params.sortBy as string),
+                sortOrder: JSON.parse(params.sortOrder as string),
+                searchText: params.searchText as string,
+                currentPage: parseInt(params.currentPage as string),
+            }
+            dispatch(setFilters(obj))
             isSearch.current = true
         } //TODO:Допилить localStorage
         // else if (localStorage.length > 0) {
@@ -89,11 +103,11 @@ const Home = () => {
         } else {
             if (isMounted.current) {
                 const queryString = qs.stringify({
-                    sortBy: sortType,
-                    category: categoryId,
-                    page: currentPage,
-                    order: orderType,
-                    search: searchValue,
+                    sortType: sortType,
+                    categoryId: categoryId,
+                    currentPage: currentPage,
+                    sortOrder: orderType,
+                    searchText: searchValue,
                 })
                 navigate(`?${queryString}`)
 
@@ -120,7 +134,7 @@ const Home = () => {
 
     const getPizzas = async () => {
         const categories = categoryId === 0 ? '' : `category=${categoryId}`
-        const sort = sortNames[parseInt(sortType)]
+        const sort = sortNames[sortType]
         const order = orderType ? 'asc' : 'desc'
         const search = searchValue
             ? `&search=${searchValue.toLowerCase().replace(/\s/gi, '')}`
@@ -132,7 +146,7 @@ const Home = () => {
                 sort,
                 order,
                 search,
-                currentPage,
+                currentPage: String(currentPage),
             })
         )
 
@@ -207,6 +221,10 @@ const Home = () => {
         alignItems: 'center',
     }
 
+    const onChangePage = useCallback((id: number) => {
+        dispatch(setCurrentPage(id))
+    }, [])
+
     return (
         <>
             <div className="content__top">
@@ -225,7 +243,7 @@ const Home = () => {
             <h2 className="content__title">Все пиццы</h2>
             <div
                 style={
-                    errorBlock || pizzaBlocks.length === 0 ? errorStyles : null
+                    errorBlock || pizzaBlocks.length === 0 ? errorStyles : {}
                 }
                 className="content__items"
             >
@@ -239,7 +257,7 @@ const Home = () => {
                     errorBlock
                 )}
             </div>
-            <Pagination onChangePage={(id) => dispatch(setCurrentPage(id))} />
+            <Pagination onChangePage={onChangePage} />
         </>
     )
 }

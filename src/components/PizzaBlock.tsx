@@ -1,12 +1,23 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { nanoid } from 'nanoid'
-import { addItem } from '../../redux/slices/cartSlice'
+import { addItem, CartItem } from '../redux/slices/cartSlice'
 import { Link } from 'react-router-dom'
+import { RootState } from '../redux/store'
 
-const PizzaBlock = ({ id, price, title, category, imageUrl, sizes, types }) => {
-    const cartItem = useSelector((state) =>
-        state.cart.items.find((obj) => obj.id === id)
+type PizzaBlockProps = {
+    id: number,
+    price: number,
+    title: string,
+    category: number,
+    imageUrl: string,
+    sizes: number[],
+    types: number[]
+}
+
+const PizzaBlock: React.FC<PizzaBlockProps> = ({ id, price, title, category, imageUrl, sizes, types }) => {
+    const cartItem = useSelector((state: RootState) =>
+        state.cart.items.find((obj: {id:number}) => obj.id === id)
     )
     const [sizeActive, setSizeActive] = useState(0)
     const [typeActive, setTypeActive] = useState(0)
@@ -14,13 +25,14 @@ const PizzaBlock = ({ id, price, title, category, imageUrl, sizes, types }) => {
     const dispatch = useDispatch()
 
     const onClickAdd = () => {
-        const item = {
+        const item: CartItem = {
             id,
             title,
             price,
             imageUrl,
             type: typeNames[typeActive],
             size: sizeActive,
+            count: 0
         }
         dispatch(addItem(item))
     }

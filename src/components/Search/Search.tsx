@@ -1,15 +1,16 @@
 import styles from './Search.module.scss'
-import { useContext, useState, useCallback } from 'react'
-import { AppContext } from '../../App'
+import React, { useContext, useState, useCallback } from 'react'
+// import { AppContext } from '../../App'
 import debounce from 'lodash.debounce'
 import { setSearchText } from '../../redux/slices/filterSlice'
 import { useDispatch } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
 
-const Search = () => {
+const Search: React.FC = () => {
     const dispatch = useDispatch()
     const [searchParams, setSearchParams] = useSearchParams()
-    const [value, setValue] = useState(searchParams.get('search'))
+    const [value, setValue] = useState(searchParams.get('search') || '')
+    // const inputRef = useRef<HTMLInputElement>(null)
     // const { setSearchValue } = useContext(AppContext)
 
     const udpateSearchValue = useCallback(
@@ -20,7 +21,12 @@ const Search = () => {
         []
     )
 
-    const onChangeInput = (e) => {
+    // const onChangeInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    //     setValue(e.target.value)
+    //     udpateSearchValue(e.target.value)
+    // }
+
+    const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value)
         udpateSearchValue(e.target.value)
     }
@@ -40,7 +46,7 @@ const Search = () => {
             </svg>
             <input
                 value={value}
-                onChange={(e) => onChangeInput(e)}
+                onChange={onChangeInput}
                 className={styles.input}
                 placeholder="Поиск пицц..."
             />

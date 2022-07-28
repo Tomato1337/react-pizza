@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { nanoid } from 'nanoid'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -6,28 +6,39 @@ import {
     setSortTypeActive,
     setSortOrder,
     selectSort,
-} from '../../redux/slices/filterSlice'
+} from '../redux/slices/filterSlice'
+import { RootState } from '../redux/store'
 
-const Sort = () => {
+type SortElem = string[]
+
+const Sort: React.FC = () => {
     const value = useSelector(selectSort)
-    const sortTypeActive = useSelector((state) => state.filter.sortTypeActive)
-    const sortOrder = useSelector((state) => state.filter.sortOrder)
+    const {sortTypeActive, sortOrder} = useSelector((state: RootState) => state.filter)
+    // const sortTypeActive = useSelector<{filter: {sortTypeActive: boolean}}>((state) => state.filter.sortTypeActive)
+    // const sortOrder = useSelector<{filter: {sortOrder: boolean}}>((state) => state.filter.sortOrder)
     const dispatch = useDispatch()
-    const sortRef = useRef(false)
+    const sortRef = useRef<HTMLDivElement>(null)
     // const [sortActive, setSortActive] = useState(false)
     // const [sortItemActive, setSortItemActive] = useState('популярности')
-    const sortElem = ['популярности', 'цене', 'алфавиту']
+    const sortElem: SortElem = ['популярности', 'цене', 'алфавиту']
 
-    const changeStatus = (elem) => {
+    const changeStatus = (elem: number) => {
         // onClickSort(elem)
         // setSortActive(false)
         dispatch(setSortType(elem))
         dispatch(setSortTypeActive(false))
     }
 
+    // type PopUpClick = MouseEvent & {
+    //     path: Node[]
+    // }
+
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (!event.composedPath().includes(sortRef.current)) {
+        const handleClickOutside = (event: MouseEvent ) => {
+            // if (!event.composedPath().includes(sortRef.current as EventTarget)) {
+            //     dispatch(setSortTypeActive(false))
+            // }
+            if (sortRef.current && !event.composedPath().includes(sortRef.current)) {
                 dispatch(setSortTypeActive(false))
             }
         }

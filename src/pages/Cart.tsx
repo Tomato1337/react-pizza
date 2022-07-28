@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
     addItem,
@@ -7,12 +7,14 @@ import {
     removeItem,
 } from '../redux/slices/cartSlice'
 import emptyCart from '../assets/img/empty-cart.png'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { RootState } from '../redux/store'
+import clsx from 'clsx'
 
-const Cart = () => {
-    const items = useSelector((state) => state.cart.items)
-    const price = useSelector((state) => state.cart.totalPrice)
-    const totalCount = items.reduce((sum, item) => sum + item.count, 0)
+const Cart: React.FC = () => {
+    const items = useSelector((state: RootState) => state.cart.items)
+    const price = useSelector((state: RootState) => state.cart.totalPrice)
+    const totalCount = items.reduce((sum: number, item: {count: number}) => sum + item.count, 0)
     const dispatch = useDispatch()
 
     if (items.length === 0) {
@@ -55,6 +57,7 @@ const Cart = () => {
                         </svg>
                         Корзина
                     </h2>
+
                     <div
                         onClick={() => dispatch(clearItems())}
                         className="cart__clear"
@@ -100,8 +103,8 @@ const Cart = () => {
                     </div>
                 </div>
                 <div className="content__items" style={{ display: 'block' }}>
-                    {items.map((item) => {
-                        return <View {...item} />
+                    {items.map((item, i) => {
+                        return <View key={i} {...item} />
                     })}
                 </div>
                 <div className="cart__bottom">
@@ -118,7 +121,6 @@ const Cart = () => {
                     <div className="cart__bottom-buttons">
                         <Link
                             to="/"
-                            href="/"
                             className="button button--outline button--add go-back-btn"
                         >
                             <svg
@@ -149,7 +151,17 @@ const Cart = () => {
     )
 }
 
-const View = (props) => {
+type ViewProps = {
+    title: string,
+    price: number,
+    count: number,
+    imageUrl: string,
+    size: number,
+    type: string,
+    id: number,
+}
+
+const View: React.FC<ViewProps> = (props) => {
     const { title, price, count, imageUrl, size, type, id } = props
     const typeName = ['26', '30', '40']
     const dispatch = useDispatch()
@@ -170,9 +182,12 @@ const View = (props) => {
                 </p>
             </div>
             <div className="cart__item-count">
-                <div
+                <button
+                    // disabled={count === 1}
                     onClick={() => dispatch(minusItem(props))}
-                    className="button button--outline button--circle cart__item-count-minus"
+                    className={clsx('button button--disabled button--outline button--circle cart__item-count-minus', 
+                    {'cart__item-count-minus--disabled': count === 1}
+                    )}
                 >
                     <svg
                         width="10"
@@ -190,10 +205,10 @@ const View = (props) => {
                             fill="#EB5A1E"
                         />
                     </svg>
-                </div>
+                </button>
                 <b>{count}</b>
-                <div
-                    onClick={() => dispatch(addItem({ id }))}
+                <button
+                    onClick={() => dispatch(addItem(props))}
                     className="button button--outline button--circle cart__item-count-plus"
                 >
                     <svg
@@ -212,13 +227,13 @@ const View = (props) => {
                             fill="#EB5A1E"
                         />
                     </svg>
-                </div>
+                </button>
             </div>
             <div className="cart__item-price">
                 <b>{price} ₽</b>
             </div>
             <div
-                onClick={() => dispatch(removeItem({ id }))}
+                onClick={() => dispatch(removeItem(props))}
                 className="cart__item-remove"
             >
                 <div className="button button--outline button--circle">
@@ -246,11 +261,11 @@ const View = (props) => {
 
 const ViewEmpty = () => {
     return (
-        <div class="content">
-            <div class="container container--cart">
-                <div class="cart cart--empty">
+        <div className="content">
+            <div className="container container--cart">
+                <div className="cart cart--empty">
                     <h2>
-                        Корзина пустая <icon>😕</icon>
+                        Корзина пустая 😕
                     </h2>
                     <p>
                         Вероятней всего, вы не заказывали ещё пиццу.
@@ -259,7 +274,7 @@ const ViewEmpty = () => {
                         страницу.
                     </p>
                     <img src={emptyCart} alt="Empty cart" />
-                    <Link to="/" class="button button--black">
+                    <Link to="/" className="button button--black">
                         <span>Вернуться назад</span>
                     </Link>
                 </div>
