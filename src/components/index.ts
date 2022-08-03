@@ -5,3 +5,5 @@ export { default as NotFoundBlock } from './NotFoundBlock/NotFoundBlock';
 export { default as Categories } from './Categories';
 export { default as Pagination } from './Pagination/Pagination';
 export { default as Sort } from './Sort';
+
+//export *  from './Sort'; не именнованный экспорт

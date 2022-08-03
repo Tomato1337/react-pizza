@@ -6,11 +6,10 @@ import { RootState } from '../../redux/store'
 import { useWhyDidYouUpdate } from 'ahooks'
 
 type PaginationProps = {
-    onChangePage: (i: number) => void // onChangePage? - опциональный параметр
+    onChangePage: (i: number) => void
 }
 
 const Pagination: React.FC<PaginationProps> = memo(({ onChangePage }) => {
-    // onChangePage.?(parametr) - если функции не будет, то ничего не произойдет
     const currentPage = useSelector((state: RootState) => state.filter.currentPage)
 
     useWhyDidYouUpdate('Pagination', { onChangePage, currentPage })
@@ -24,7 +23,6 @@ const Pagination: React.FC<PaginationProps> = memo(({ onChangePage }) => {
             pageRangeDisplayed={4}
             pageCount={3}
             previousLabel="<"
-            // renderOnZeroPageCount={null}
             forcePage={currentPage - 1}
         />
     )

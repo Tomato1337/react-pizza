@@ -1,8 +1,8 @@
 import logo from '../assets/img/pizza-logo.svg'
 import { Link, useLocation } from 'react-router-dom'
 import Search from './Search/Search'
-import { useDispatch, useSelector } from 'react-redux'
-import { addItems, selectCart } from '../redux/slices/cartSlice'
+import { useSelector } from 'react-redux'
+import { selectCart } from '../redux/slices/cartSlice'
 import { useEffect } from 'react'
 import { useRef } from 'react'
 
@@ -32,10 +32,7 @@ const Header: React.FC = () => {
                         </div>
                     </div>
                 </Link>
-                {location.pathname !== '/cart' ?                 <Search
-                // searchValue={searchValue}
-                // setSearchValue={setSearchValue}
-                /> : null}
+                {location.pathname !== '/cart' ? <Search/> : null}
                 <div className="header__cart">
                     <Link to="/cart" className="button button--cart">
                         <span>{totalPrice} ₽</span>

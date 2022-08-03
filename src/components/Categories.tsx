@@ -1,4 +1,3 @@
-import { useCallback, useMemo, useState } from 'react'
 import { nanoid } from 'nanoid'
 import { useSelector, useDispatch } from 'react-redux'
 import { setCategoryId } from '../redux/slices/filterSlice'
@@ -7,7 +6,6 @@ import { useWhyDidYouUpdate } from 'ahooks';
 
 
 const Categories: React.FC = () => {
-    // const [activeItem, setActiveItem] = useState('Все')
     const value = useSelector((state: RootState) => state.filter.categoryId)
     const dispatch = useDispatch()
 

@@ -1,6 +1,5 @@
 import styles from './Search.module.scss'
-import React, { useContext, useState, useCallback } from 'react'
-// import { AppContext } from '../../App'
+import React, { useState, useCallback } from 'react'
 import debounce from 'lodash.debounce'
 import { setSearchText } from '../../redux/slices/filterSlice'
 import { useDispatch } from 'react-redux'
@@ -10,21 +9,13 @@ const Search: React.FC = () => {
     const dispatch = useDispatch()
     const [searchParams, setSearchParams] = useSearchParams()
     const [value, setValue] = useState(searchParams.get('search') || '')
-    // const inputRef = useRef<HTMLInputElement>(null)
-    // const { setSearchValue } = useContext(AppContext)
 
     const udpateSearchValue = useCallback(
         debounce((str) => {
-            // setSearchValue(str)
             dispatch(setSearchText(str))
         }, 250),
         []
     )
-
-    // const onChangeInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    //     setValue(e.target.value)
-    //     udpateSearchValue(e.target.value)
-    // }
 
     const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value)

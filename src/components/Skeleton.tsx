@@ -1,5 +1,4 @@
 import React from 'react'
-import { nanoid } from 'nanoid'
 import ContentLoader from 'react-content-loader'
 
 type SkeletonProps = {
@@ -10,7 +9,6 @@ const Skeleton: React.FC<SkeletonProps> = (props) => {
     return (
         <ContentLoader
             speed={2}
-            // key={nanoid()}
             width={300}
             className="pizza-block"
             height={465}

@@ -29,7 +29,6 @@ const cartSlice = createSlice({
             const findItem = state.items.find(
                 (obj) => obj.id === action.payload.id
             )
-            // const findItemByLocalStorage = JSON.parse(localStorage.getItem('cart')).find(obj => obj.id === action.payload.id)
 
             if (findItem) {
                 findItem.count++
@@ -43,7 +42,6 @@ const cartSlice = createSlice({
                 (sum, obj) => sum + obj.price * obj.count,
                 0
             )
-            // localStorage.setItem('cart', JSON.stringify(state.items))
         },
         minusItem: (state, action: PayloadAction<CartItem>) => {
             const findItem = state.items.find(
@@ -57,7 +55,6 @@ const cartSlice = createSlice({
                 (sum, obj) => sum + obj.price * obj.count,
                 0
             )
-            // localStorage.setItem('cart', JSON.stringify(state.items))
         },
         removeItem: (state, action: PayloadAction<CartItem>) => {
             state.items = state.items.filter(
@@ -67,12 +64,10 @@ const cartSlice = createSlice({
                 (sum, obj) => sum + obj.price * obj.count,
                 0
             )
-            // localStorage.setItem('cart', JSON.stringify(state.items))
         },
         clearItems: (state) => {
             state.items = []
             state.totalPrice = 0
-            // localStorage.setItem('cart', JSON.stringify(state.items))
         },
         addItems: (state, action: PayloadAction<CartItem[]>) => {
             state.items = action.payload
